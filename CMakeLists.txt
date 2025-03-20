@@ -7,6 +7,8 @@ include(GNUInstallDirs)
 find_package(OpenSSL)
 find_package(Curses)
 
+option(CURSES_OLD_KEYS "curses terminal will use old key handler" NO)
+
 check_include_file("dlfcn.h" HAVE_DLFCN_H)
 check_include_file("fcntl.h" HAVE_FCNTL_H)
 check_include_file("inttypes.h" HAVE_INTTYPES_H)
@@ -32,6 +34,10 @@ if (${CMAKE_HOST_SYSTEM_NAME} MATCHES "Windows")
 endif()
 
 add_definitions ( -D_VERSION=${CMAKE_PROJECT_VERSION} -D_PACKAGE=${CMAKE_PROJECT_NAME} -DSYSCONFDIR="${CMAKE_INSTALL_FULL_SYSCONFDIR}")
+
+if(CURSES_OLD_KEYS)
+    add_definitions( -D USE_OWN_KEY_PARSING=1)
+endif()
 
 add_subdirectory(curses)
 add_subdirectory(doc)
