@@ -3,7 +3,7 @@ project (lp5250d LANGUAGES C)
 
 include_directories(${CMAKE_BINARY_DIR} ../lib5250)
 
-if (HAVE_SYSLOG_H)
+if (HAVE_SYSLOG_H AND NOT ${CMAKE_HOST_SYSTEM_NAME} MATCHES "Windows")
     foreach(program scs2ascii scs2pdf scs2ps lp5250d)
         add_executable(${program} ${program}.c)
         add_dependencies(${program} 5250)
