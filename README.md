@@ -6,35 +6,6 @@ implementation for Linux, but it has been reportedly compiled on a number
 of other platforms. Contributed keyboard maps and termcap entries for
 FreeBSD are in this tarball as well (see freebsd/README for more information).
 
-Building from Git
------------------
-
-Skip to "Building and Installing" below if you got these sources from a
-.tar.gz release file.
-
-Certain files, such as the libtool support files and some shell scripts
-which replace possibly missing commands on the target system are not in
-git because we don't maintain them. They can be installed with the
-following command:
-
-```bash
-./autogen.sh
-```
-
-This command requires current versions of the following packages, and the
-generated files may not work properly.
-
-```bash
-automake
-autoconf
-libtool
-```
-
-You may receive an error the first time you run this script. If so, run
-the script a second time to make sure you don't get an error (this is a bug
-with automake).
-
-
 Building and Installing
 -----------------------
 
@@ -42,6 +13,8 @@ To build the emulator simply type the following:
 
 ```bash
 ./configure
+mkdir build
+cmake -B build
 make
 make install
 ```
