@@ -5,6 +5,7 @@ include(CheckIncludeFile)
 include(GNUInstallDirs)
 
 find_package(OpenSSL)
+find_package(Iconv)
 
 if (NOT WIN32)
     # For now, assume Windows users don't want curses build

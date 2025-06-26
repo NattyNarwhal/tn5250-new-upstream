@@ -22,6 +22,8 @@
 #ifndef UTILITY_H
 #define UTILITY_H
 
+#include <iconv.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -55,9 +57,9 @@ const char* tn5250_strerror(void);
  */
 
 struct _Tn5250CharMap {
-    const char* name;
-    const unsigned char* to_remote_map;
-    const unsigned char* to_local_map;
+    char* name;
+    iconv_t *to_remote_conv;
+    iconv_t *to_local_conv;
 };
 
 typedef struct _Tn5250CharMap Tn5250CharMap;
@@ -68,8 +70,6 @@ struct _clientaddr {
 };
 
 typedef struct _clientaddr clientaddr;
-
-extern Tn5250CharMap tn5250_transmaps[];
 /*******/
 
 Tn5250CharMap* tn5250_char_map_new(const char* maping);

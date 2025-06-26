@@ -20,7 +20,6 @@
  *
  */
 #include "tn5250-private.h"
-#include "transmaps.h"
 
 #if defined(__SVR4) && defined(__sun)
 #include <sys/filio.h>
@@ -199,7 +198,14 @@ const char* tn5250_strerror(void) {
  *    Translate the specified character from local to remote.
  *****/
 Tn5250Char tn5250_char_map_to_remote(Tn5250CharMap* map, Tn5250Char ascii) {
-    return map->to_remote_map[ascii];
+   char in[7], out[7];
+   char *inp = in, *outp = out;
+   in[0] = ascii;
+   in[1] = '\0';
+   out[0] = '\0';
+   size_t inleft = 1, outleft = 6;
+   iconv(map->to_remote_conv, (char**)&inp, &inleft, (char**)&outp, &outleft);
+   return out[0];
 }
 
 /****f* lib5250/tn5250_char_map_to_local
@@ -219,7 +225,16 @@ Tn5250Char tn5250_char_map_to_local(Tn5250CharMap* map, Tn5250Char ebcdic) {
     case 0:
         return ' ';
     default:
-        return map->to_local_map[ebcdic];
+        {
+            char in[7], out[7];
+            char *inp = in, *outp = out;
+            in[0] = ebcdic;
+            in[1] = '\0';
+            out[0] = '\0';
+            size_t inleft = 1, outleft = 6;
+            iconv(map->to_local_conv, (char**)&inp, &inleft, (char**)&outp, &outleft);
+            return out[0];
+        }
     }
 }
 
@@ -237,85 +252,17 @@ Tn5250Char tn5250_char_map_to_local(Tn5250CharMap* map, Tn5250Char ebcdic) {
  *    call tn5250_char_map_destroy (a no-op) for future compatibility.
  *****/
 Tn5250CharMap* tn5250_char_map_new(const char* map) {
-    Tn5250CharMap* t;
-
-    /* XXX: HACK: These characters were reported wrong in transmaps.h.
-            Since that's a generated file, I'm overriding them here -SCK */
+    Tn5250CharMap* t = calloc(1, sizeof(Tn5250CharMap));
+    t->name = strdup(map);
 
     TN5250_LOG(("tn5250_char_map_new: map = \"%s\"\n", map));
 
-    if (!strcmp(map, "870") || !strcmp(map, "win870")) {
+#define SYS_ENCODING "ISO-8859-1"
+    // XXX: Should prefix numeric ones with IBM-
+    t->to_remote_conv = iconv_open(map, SYS_ENCODING);
+    t->to_local_conv = iconv_open(SYS_ENCODING, map);
 
-        TN5250_LOG(("tn5250_char_map_new: Installing 870 workaround\n"));
-
-        memcpy(mapfix, windows_1250_to_ibm870, sizeof(mapfix));
-        memcpy(mapfix2, ibm870_to_windows_1250, sizeof(mapfix2));
-        memcpy(mapfix3, iso_8859_2_to_ibm870, sizeof(mapfix3));
-        memcpy(mapfix4, ibm870_to_iso_8859_2, sizeof(mapfix4));
-
-        mapfix[142] = 184;
-        mapfix[143] = 185;
-        mapfix[158] = 182;
-        mapfix[159] = 183;
-        mapfix[163] = 186;
-        mapfix[202] = 114;
-        mapfix[234] = 82;
-
-        mapfix2[82] = 234;
-        mapfix2[114] = 202;
-        mapfix2[182] = 158;
-        mapfix2[183] = 159;
-        mapfix2[184] = 142;
-        mapfix2[185] = 143;
-        mapfix2[186] = 163;
-
-        mapfix3[163] = 186;
-        mapfix3[172] = 185;
-        mapfix3[188] = 183;
-        mapfix3[202] = 114;
-        mapfix3[234] = 82;
-
-        mapfix4[82] = 234;
-        mapfix4[114] = 202;
-        mapfix4[183] = 188;
-        mapfix4[185] = 172;
-        mapfix4[186] = 163;
-
-        for (t = tn5250_transmaps; t->name; t++) {
-            if (!strcmp(t->name, "win870")) {
-                t->to_remote_map = mapfix;
-                t->to_local_map = mapfix2;
-                TN5250_LOG(("Workaround installed for map \"win870\"\n"));
-            }
-            else if (!strcmp(t->name, "870")) {
-                t->to_remote_map = mapfix3;
-                t->to_local_map = mapfix4;
-                TN5250_LOG(("Workaround installed for map \"870\"\n"));
-            }
-        }
-    }
-
-    /* Under Windows, we'll try the "winXXX" maps first, then fall back
-       to the standard (unix) versions */
-#ifdef _WIN32
-    {
-        char winmap[10];
-        _snprintf(winmap, sizeof(winmap) - 1, "win%s", map);
-        for (t = tn5250_transmaps; t->name; t++) {
-            if (strcmp(t->name, winmap) == 0) {
-                TN5250_LOG(("Using map %s\n", t->name));
-                return t;
-            }
-        }
-    }
-#endif
-
-    for (t = tn5250_transmaps; t->name; t++) {
-        if (strcmp(t->name, map) == 0) {
-            return t;
-        }
-    }
-    return NULL;
+    return t;
 }
 
 /****f* lib5250/tn5250_char_map_destroy
@@ -328,7 +275,11 @@ Tn5250CharMap* tn5250_char_map_new(const char* map) {
  * DESCRIPTION
  *    Frees the character map's resources.
  *****/
-void tn5250_char_map_destroy(Tn5250CharMap* map) { /* NOOP */
+void tn5250_char_map_destroy(Tn5250CharMap* map) {
+    free(map->name);
+    iconv_close(map->to_remote_conv);
+    iconv_close(map->to_local_conv);
+    free(map);
 }
 
 /****f* lib5250/tn5250_char_map_printable_p

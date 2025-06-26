@@ -184,8 +184,6 @@ bomb_out:
 
 static void syntax() {
     struct valid_term* p;
-    Tn5250CharMap* m;
-    int i = 0;
 
     printf("tn5250 - TCP/IP 5250 emulator\n\
 Syntax:\n\
@@ -198,15 +196,6 @@ Syntax:\n\
     printf("\n\
 Options:\n\
    map=NAME                Character map (default is '37'):");
-    m = tn5250_transmaps;
-    while (m->name != NULL) {
-        if (i % 5 == 0) {
-            printf("\n                             ");
-        }
-        printf("%s, ", m->name);
-        m++;
-        i++;
-    }
     printf("\n\
    env.DEVNAME=NAME         Use NAME as session name (default: none).\n");
 #ifndef NDEBUG
