@@ -238,6 +238,64 @@ Tn5250Char tn5250_char_map_to_local(Tn5250CharMap* map, Tn5250Char ebcdic) {
     }
 }
 
+int tn5250_encoding_name_works(const char *encoding)
+{
+    iconv_t test_iconv = iconv_open(encoding, "UTF-8");
+    if (test_iconv == (iconv_t)-1) {
+        return 1;
+    }
+    return iconv_close(test_iconv) == 0;
+}
+
+char *tn5250_encoding_name(const char *map)
+{
+    /* The iconv names for encodings are pretty inconsistent, unfortunately.
+     * We can try some fallbacks for names if the common names in most
+     * implementations don't work. On AIX, in theory, we could use ccsidtocs.
+     */
+#define ENCODING_MAPPING(input, output) \
+    if(strcmp(map, input) == 0 && tn5250_encoding_name_works(output)) \
+        return strdup(output)
+    /* US */
+    ENCODING_MAPPING("37", "EBCDIC-CP-US");
+    /* Netherlands */
+    ENCODING_MAPPING("256", "EBCDIC-CP-NL");
+    /* Germany, Austria */
+    ENCODING_MAPPING("273", "EBCDIC-AT-DE");
+    /* Norway, Denmark */
+    ENCODING_MAPPING("277", "EBCDIC-CP-DK");
+    /* Sweden, Finland */
+    ENCODING_MAPPING("277", "EBCDIC-CP-FI");
+    /* Italy */
+    ENCODING_MAPPING("280", "EBCDIC-CP-IT");
+    /* Japanese (Kana) - japanese encodings are a mess... */
+    ENCODING_MAPPING("290", "EBCDIC-JP-KANA");
+    /* Spain, Latin America */
+    ENCODING_MAPPING("284", "EBCDIC-CP-ES");
+    /* UK */
+    ENCODING_MAPPING("285", "EBCDIC-CP-GB");
+    /* France */
+    ENCODING_MAPPING("297", "EBCDIC-CP-FR");
+    /* Arabic */
+    ENCODING_MAPPING("420", "EBCDIC-CP-AR1");
+    /* Hebrew */
+    ENCODING_MAPPING("420", "EBCDIC-CP-HE");
+    /* Belgium, Canada, Switzerland, Latin-1 */
+    ENCODING_MAPPING("500", "EBCDIC-CP-BE");
+    /* Latin-2 Multilingual (Yugoslav?) */
+    ENCODING_MAPPING("870", "EBCDIC-CP-YU");
+    /* Iceland */
+    ENCODING_MAPPING("871", "EBCDIC-CP-IS");
+    /* Greece */
+    ENCODING_MAPPING("875", "EBCDIC-GREEK");
+    /* Cyrillic Multilingual */
+    ENCODING_MAPPING("880", "EBCDIC-CYRILLIC");
+    /* Turkish, Latin-3 Multilingual */
+    ENCODING_MAPPING("905", "EBCDIC-CP-TR");
+    /* XXX: Fallback names for IBM/IBM- prefixes */
+    return NULL;
+}
+
 /****f* lib5250/tn5250_char_map_new
  * NAME
  *    tn5250_char_map_new
@@ -252,15 +310,30 @@ Tn5250Char tn5250_char_map_to_local(Tn5250CharMap* map, Tn5250Char ebcdic) {
  *    call tn5250_char_map_destroy (a no-op) for future compatibility.
  *****/
 Tn5250CharMap* tn5250_char_map_new(const char* map) {
-    Tn5250CharMap* t = calloc(1, sizeof(Tn5250CharMap));
-    t->name = strdup(map);
-
     TN5250_LOG(("tn5250_char_map_new: map = \"%s\"\n", map));
 
 #define SYS_ENCODING "ISO-8859-1"
-    // XXX: Should prefix numeric ones with IBM-
-    t->to_remote_conv = iconv_open(map, SYS_ENCODING);
-    t->to_local_conv = iconv_open(SYS_ENCODING, map);
+    char *encoding_name = tn5250_encoding_name(map);
+    TN5250_LOG(("using iconv encoding name \"%s\"\n", encoding_name));
+    if (encoding_name == NULL) {
+        return NULL;
+    }
+    iconv_t to_remote_conv = iconv_open(encoding_name, SYS_ENCODING);
+    if (to_remote_conv == (iconv_t)-1) {
+        free(encoding_name);
+        return NULL;
+    }
+    iconv_t to_local_conv = iconv_open(SYS_ENCODING, encoding_name);
+    if (to_local_conv == (iconv_t)-1) {
+        free(encoding_name);
+        iconv_close(to_remote_conv);
+        return NULL;
+    }
+
+    Tn5250CharMap* t = calloc(1, sizeof(Tn5250CharMap));
+    t->name = encoding_name;
+    t->to_remote_conv = to_remote_conv;
+    t->to_local_conv = to_local_conv;
 
     return t;
 }
