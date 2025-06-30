@@ -23,11 +23,6 @@
 #include "tn5250-private.h"
 #include "cursesterm.h"
 
-/* Some versions of ncurses don't have this defined. */
-#ifndef A_VERTICAL
-#define A_VERTICAL ((1UL) << ((22) + 8))
-#endif /* A_VERTICAL */
-
 /* Some older versions of ncurses don't define NCURSES_COLOR_T */
 #ifndef NCURSES_COLOR_T
 #define NCURSES_COLOR_T short
