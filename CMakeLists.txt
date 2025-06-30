@@ -10,6 +10,7 @@ find_package(Iconv)
 if (NOT WIN32)
     # For now, assume Windows users don't want curses build
     set(CURSES_NEED_NCURSES TRUE)
+    set(CURSES_NEED_WIDE TRUE)
     find_package(Curses REQUIRED)
 endif()
 

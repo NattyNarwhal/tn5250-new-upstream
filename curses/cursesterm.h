@@ -22,7 +22,10 @@
 #ifndef CURSESTERM_H
 #define CURSESTERM_H
 
-#if defined(HAVE_NCURSES_NCURSES_H)
+#if 1
+#define NCURSES_WIDECHAR 1
+#include <ncursesw/ncurses.h>
+#elif defined(HAVE_NCURSES_NCURSES_H)
 #include <ncurses/ncurses.h>
 #elif defined(HAVE_NCURSES_H)
 #include <ncurses.h>
