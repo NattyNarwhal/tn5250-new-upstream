@@ -890,12 +890,13 @@ static int curses_terminal_waitevent(Tn5250Terminal* This) {
  *    DOCUMENT ME!!!
  *****/
 static int curses_terminal_getkey(Tn5250Terminal* This) {
-    int key;
+    wint_t key;
+    int ret;
     MEVENT event;
 
-    key = getch();
+    ret = get_wch(&key);
 
-    while (1) {
+    if (ret == KEY_CODE_YES || ret == OK) {
         switch (key) {
 
         case KEY_MOUSE:
@@ -990,6 +991,8 @@ static int curses_terminal_getkey(Tn5250Terminal* This) {
         default:
             return key;
         }
+    } else if (ret == ERR) {
+        return -1;
     }
 }
 #endif
@@ -1036,7 +1039,8 @@ static int curses_terminal_enhanced(Tn5250Terminal* This) { return (0); }
  *    <Esc> or <Ctrl+g>), handle the next key in the sequence.
  *****/
 static int curses_terminal_get_esc_key(Tn5250Terminal* This, int is_esc) {
-    int y, x, key, display_key;
+    int y, x, display_key, ret;
+    wint_t key;
     fd_set fdr;
 
     getyx(stdscr, y, x);
@@ -1050,7 +1054,7 @@ static int curses_terminal_get_esc_key(Tn5250Terminal* This, int is_esc) {
     move(y, x);
     refresh();
 
-    key = getch();
+    ret = get_wch(&key);
 
     if (isalpha(key)) {
         key = toupper(key);
