@@ -39,32 +39,20 @@ typedef struct _curses_color_map curses_color_map;
 static curses_color_map colorlist[] = {
     // clang-format off
     { "black",     COLOR_BLACK          },
-    { "red",       COLOR_RED,    A_BOLD },
+    { "red",       COLOR_RED,    WA_BOLD },
     { "green",     COLOR_GREEN          },
-    { "yellow",    COLOR_YELLOW, A_BOLD },
-    { "blue",      COLOR_CYAN,   A_BOLD },
+    { "yellow",    COLOR_YELLOW, WA_BOLD },
+    { "blue",      COLOR_CYAN,   WA_BOLD },
     { "pink",      COLOR_MAGENTA        },
     { "turquoise", COLOR_CYAN           },
-    { "white",     COLOR_WHITE,  A_BOLD },
+    { "white",     COLOR_WHITE,  WA_BOLD },
     { NULL,        -1                   }
     // clang-format on
 };
 
-#define A_5250_GREEN                                                           \
-    ((attr_t)COLOR_PAIR(COLOR_GREEN) | colorlist[COLOR_GREEN].bld)
-#define A_5250_WHITE                                                           \
-    ((attr_t)COLOR_PAIR(COLOR_WHITE) | colorlist[COLOR_WHITE].bld)
-#define A_5250_RED  ((attr_t)COLOR_PAIR(COLOR_RED) | colorlist[COLOR_RED].bld)
-#define A_5250_TURQ ((attr_t)COLOR_PAIR(COLOR_CYAN) | colorlist[COLOR_CYAN].bld)
-#define A_5250_YELLOW                                                          \
-    ((attr_t)COLOR_PAIR(COLOR_YELLOW) | colorlist[COLOR_YELLOW].bld)
-#define A_5250_PINK                                                            \
-    ((attr_t)COLOR_PAIR(COLOR_MAGENTA) | colorlist[COLOR_MAGENTA].bld)
-#define A_5250_BLUE ((attr_t)COLOR_PAIR(COLOR_BLUE) | colorlist[COLOR_BLUE].bld)
-
 /*@-globstate -nullpass@*/ /* lclint incorrectly assumes stdscr may be NULL */
 
-static attr_t attribute_map[33];
+static curses_color_map attribute_map[33];
 
 static void curses_terminal_init(Tn5250Terminal* This) /*@modifies This@*/;
 static void curses_terminal_term(Tn5250Terminal* This) /*@modifies This@*/;
@@ -370,38 +358,38 @@ static void curses_terminal_init(Tn5250Terminal* This) {
     }
 
     x = -1;
-    attribute_map[++x] = A_5250_GREEN;
-    attribute_map[++x] = A_5250_GREEN | A_REVERSE;
-    attribute_map[++x] = A_5250_WHITE;
-    attribute_map[++x] = A_5250_WHITE | A_REVERSE;
-    attribute_map[++x] = A_5250_GREEN | A_UNDERLINE;
-    attribute_map[++x] = A_5250_GREEN | A_UNDERLINE | A_REVERSE;
-    attribute_map[++x] = A_5250_WHITE | A_UNDERLINE;
-    attribute_map[++x] = 0x00;
-    attribute_map[++x] = A_5250_RED;
-    attribute_map[++x] = A_5250_RED | A_REVERSE;
-    attribute_map[++x] = A_5250_RED | A_BLINK;
-    attribute_map[++x] = A_5250_RED | A_BLINK | A_REVERSE;
-    attribute_map[++x] = A_5250_RED | A_UNDERLINE;
-    attribute_map[++x] = A_5250_RED | A_UNDERLINE | A_REVERSE;
-    attribute_map[++x] = A_5250_RED | A_UNDERLINE | A_BLINK;
-    attribute_map[++x] = 0x00;
-    attribute_map[++x] = A_5250_TURQ | A_VERTICAL;
-    attribute_map[++x] = A_5250_TURQ | A_VERTICAL | A_REVERSE;
-    attribute_map[++x] = A_5250_YELLOW | A_VERTICAL;
-    attribute_map[++x] = A_5250_YELLOW | A_VERTICAL | A_REVERSE;
-    attribute_map[++x] = A_5250_TURQ | A_UNDERLINE | A_VERTICAL;
-    attribute_map[++x] = A_5250_TURQ | A_UNDERLINE | A_REVERSE | A_VERTICAL;
-    attribute_map[++x] = A_5250_YELLOW | A_UNDERLINE | A_VERTICAL;
-    attribute_map[++x] = 0x00;
-    attribute_map[++x] = A_5250_PINK;
-    attribute_map[++x] = A_5250_PINK | A_REVERSE;
-    attribute_map[++x] = A_5250_BLUE;
-    attribute_map[++x] = A_5250_BLUE | A_REVERSE;
-    attribute_map[++x] = A_5250_PINK | A_UNDERLINE;
-    attribute_map[++x] = A_5250_PINK | A_UNDERLINE | A_REVERSE;
-    attribute_map[++x] = A_5250_BLUE | A_UNDERLINE;
-    attribute_map[++x] = 0x00;
+    attribute_map[++x] = (curses_color_map){0, (COLOR_GREEN),   colorlist[COLOR_GREEN].bld};
+    attribute_map[++x] = (curses_color_map){0, (COLOR_GREEN),   colorlist[COLOR_GREEN].bld | WA_REVERSE};
+    attribute_map[++x] = (curses_color_map){0, (COLOR_WHITE),   colorlist[COLOR_WHITE].bld};
+    attribute_map[++x] = (curses_color_map){0, (COLOR_WHITE),   colorlist[COLOR_WHITE].bld | WA_REVERSE };
+    attribute_map[++x] = (curses_color_map){0, (COLOR_GREEN),   colorlist[COLOR_GREEN].bld | WA_UNDERLINE };
+    attribute_map[++x] = (curses_color_map){0, (COLOR_GREEN),   colorlist[COLOR_GREEN].bld | WA_UNDERLINE | WA_REVERSE};
+    attribute_map[++x] = (curses_color_map){0, (COLOR_WHITE),   colorlist[COLOR_WHITE].bld | WA_UNDERLINE};
+    attribute_map[++x] = (curses_color_map){0};
+    attribute_map[++x] = (curses_color_map){0, (COLOR_RED),     colorlist[COLOR_RED].bld};
+    attribute_map[++x] = (curses_color_map){0, (COLOR_RED),     colorlist[COLOR_RED].bld | WA_REVERSE};
+    attribute_map[++x] = (curses_color_map){0, (COLOR_RED),     colorlist[COLOR_RED].bld | WA_BLINK};
+    attribute_map[++x] = (curses_color_map){0, (COLOR_RED),     colorlist[COLOR_RED].bld | WA_BLINK | WA_REVERSE};
+    attribute_map[++x] = (curses_color_map){0, (COLOR_RED),     colorlist[COLOR_RED].bld | WA_UNDERLINE};
+    attribute_map[++x] = (curses_color_map){0, (COLOR_RED),     colorlist[COLOR_RED].bld | WA_UNDERLINE | WA_REVERSE};
+    attribute_map[++x] = (curses_color_map){0, (COLOR_RED),     colorlist[COLOR_RED].bld | WA_UNDERLINE | WA_BLINK};
+    attribute_map[++x] = (curses_color_map){0};
+    attribute_map[++x] = (curses_color_map){0, (COLOR_CYAN),    colorlist[COLOR_CYAN].bld | WA_VERTICAL};
+    attribute_map[++x] = (curses_color_map){0, (COLOR_CYAN),    colorlist[COLOR_CYAN].bld | WA_VERTICAL | WA_REVERSE};
+    attribute_map[++x] = (curses_color_map){0, (COLOR_YELLOW),  colorlist[COLOR_YELLOW].bld | WA_VERTICAL};
+    attribute_map[++x] = (curses_color_map){0, (COLOR_YELLOW),  colorlist[COLOR_YELLOW].bld | WA_VERTICAL | WA_REVERSE};
+    attribute_map[++x] = (curses_color_map){0, (COLOR_CYAN),    colorlist[COLOR_CYAN].bld | WA_UNDERLINE | WA_VERTICAL};
+    attribute_map[++x] = (curses_color_map){0, (COLOR_CYAN),    colorlist[COLOR_CYAN].bld | WA_UNDERLINE | WA_REVERSE | WA_VERTICAL};
+    attribute_map[++x] = (curses_color_map){0, (COLOR_YELLOW),  colorlist[COLOR_YELLOW].bld | WA_UNDERLINE | WA_VERTICAL};
+    attribute_map[++x] = (curses_color_map){0};
+    attribute_map[++x] = (curses_color_map){0, (COLOR_MAGENTA), colorlist[COLOR_MAGENTA].bld};
+    attribute_map[++x] = (curses_color_map){0, (COLOR_MAGENTA), colorlist[COLOR_MAGENTA].bld | WA_REVERSE};
+    attribute_map[++x] = (curses_color_map){0, (COLOR_BLUE),    colorlist[COLOR_BLUE].bld};
+    attribute_map[++x] = (curses_color_map){0, (COLOR_BLUE),    colorlist[COLOR_BLUE].bld | WA_REVERSE};
+    attribute_map[++x] = (curses_color_map){0, (COLOR_MAGENTA), colorlist[COLOR_MAGENTA].bld | WA_UNDERLINE};
+    attribute_map[++x] = (curses_color_map){0, (COLOR_MAGENTA), colorlist[COLOR_MAGENTA].bld | WA_UNDERLINE | WA_REVERSE};
+    attribute_map[++x] = (curses_color_map){0, (COLOR_BLUE),    colorlist[COLOR_BLUE].bld | WA_UNDERLINE};
+    attribute_map[++x] = (curses_color_map){0};
 
     This->data->quit_flag = 0;
 
@@ -649,7 +637,11 @@ static void curses_terminal_update(Tn5250Terminal* This,
     int my, mx;
     int y, x;
     attr_t curs_attr;
+    short color_pair;
     unsigned char a = 0x20, c;
+    /* wide char for output */
+    wchar_t wc[2] = {L' ', 0};
+    cchar_t cc[2];
 
     This->data->display = display;
 
@@ -704,54 +696,60 @@ static void curses_terminal_update(Tn5250Terminal* This,
             if ((c & 0xe0) == 0x20) { /* ATTRIBUTE */
                 a = (c & 0xff);
                 if (curses_terminal_is_ruler(This, display, x, y)) {
-                    addch(A_REVERSE | attribute_map[0] | ' ');
+		    setcchar(cc, L" ", WA_REVERSE | attribute_map[0].bld, attribute_map[0].ref, NULL);
+		    add_wch(cc);
                 }
                 else {
-                    addch(attribute_map[0] | ' ');
+		    setcchar(cc, L" ", attribute_map[0].bld, attribute_map[0].ref, NULL);
+		    add_wch(cc);
                 }
             }
             else { /* DATA */
-                curs_attr = attribute_map[a - 0x20];
-                if (curs_attr == 0x00) { /* NONDISPLAY */
+                curs_attr = attribute_map[a - 0x20].bld;
+                color_pair = attribute_map[a - 0x20].ref;
+                if ((color_pair | curs_attr) == 0x00) { /* NONDISPLAY */
                     if (curses_terminal_is_ruler(This, display, x, y)) {
-                        addch(A_REVERSE | attribute_map[0] | ' ');
+		        setcchar(cc, L" ", WA_REVERSE | attribute_map[0].bld, attribute_map[0].ref, NULL);
+		        add_wch(cc);
                     }
                     else {
-                        addch(attribute_map[0] | ' ');
+		        setcchar(cc, L" ", attribute_map[0].bld, attribute_map[0].ref, NULL);
+		        add_wch(cc);
                     }
                 }
                 else {
                     /* UNPRINTABLE -- print block */
                     if ((c == 0x1f) || (c == 0x3F)) {
-                        c = ' ';
-                        curs_attr ^= A_REVERSE;
+                        wc[0] = L' ';
+                        curs_attr ^= WA_REVERSE;
                     }
                     /* UNPRINTABLE -- print blank */
                     else if ((c < 0x40 && c > 0x00) || c == 0xff) {
-                        c = ' ';
+                        wc[0] = L' ';
                     }
                     else {
-                        c = tn5250_char_map_to_local(
+                        wc[0] = tn5250_char_map_to_local(
                             tn5250_display_char_map(display), c);
                     }
-                    if ((curs_attr & A_VERTICAL) != 0) {
-                        curs_attr |= A_UNDERLINE;
-                        curs_attr &= ~A_VERTICAL;
+                    if ((curs_attr & WA_VERTICAL) != 0) {
+                        curs_attr |= WA_UNDERLINE;
+                        curs_attr &= ~WA_VERTICAL;
                     }
                     /* This is a kludge since vga hardware doesn't support
                      * under- lining characters.  It's pretty ugly. */
                     if (This->data->underscores) {
-                        if ((curs_attr & A_UNDERLINE) != 0) {
-                            curs_attr &= ~A_UNDERLINE;
-                            if (c == ' ') {
-                                c = '_';
+                        if ((curs_attr & WA_UNDERLINE) != 0) {
+                            curs_attr &= ~WA_UNDERLINE;
+                            if (wc[0] == L' ') {
+                                wc[0] = L'_';
                             }
                         }
                     }
                     if (curses_terminal_is_ruler(This, display, x, y)) {
-                        curs_attr |= A_REVERSE;
+                        curs_attr |= WA_REVERSE;
                     }
-                    addch((chtype)(c | curs_attr));
+		    setcchar(cc, wc, curs_attr, color_pair, NULL);
+		    add_wch(cc);
                 }
             } /* if ((c & 0xe0) ... */
         }     /* for (int x ... */
@@ -837,7 +835,7 @@ static void curses_terminal_update_indicators(Tn5250Terminal /*@unused@*/* This,
     attrset((attr_t)COLOR_PAIR(COLOR_WHITE));
     mvaddnstr(tn5250_display_height(display), 0, ind_buf, 80);
     move(tn5250_display_cursor_y(display), tn5250_display_cursor_x(display));
-    attrset(A_NORMAL);
+    attrset(WA_NORMAL);
     refresh();
 }
 
@@ -1332,36 +1330,36 @@ int curses_rgb_to_color(int r, int g, int b, int* rclr, int* rbold) {
     int clr;
 
     clr = ((r & 0xff) << 16) | ((g & 0xff) << 8) | (b & 0xff);
-    *rbold = A_NORMAL;
+    *rbold = WA_NORMAL;
 
     switch (clr) {
     case 0xFFFFFF:
         *rclr = COLOR_WHITE;
-        *rbold = A_BOLD;
+        *rbold = WA_BOLD;
         break;
     case 0xFFFF00:
         *rclr = COLOR_YELLOW;
-        *rbold = A_BOLD;
+        *rbold = WA_BOLD;
         break;
     case 0xFF00FF:
         *rclr = COLOR_MAGENTA;
-        *rbold = A_BOLD;
+        *rbold = WA_BOLD;
         break;
     case 0xFF0000:
         *rclr = COLOR_RED;
-        *rbold = A_BOLD;
+        *rbold = WA_BOLD;
         break;
     case 0x00FFFF:
         *rclr = COLOR_CYAN;
-        *rbold = A_BOLD;
+        *rbold = WA_BOLD;
         break;
     case 0x00FF00:
         *rclr = COLOR_GREEN;
-        *rbold = A_BOLD;
+        *rbold = WA_BOLD;
         break;
     case 0x0000FF:
         *rclr = COLOR_BLUE;
-        *rbold = A_BOLD;
+        *rbold = WA_BOLD;
         break;
     case 0x808080:
         *rclr = COLOR_WHITE;
@@ -1414,19 +1412,19 @@ void tn5250_curses_terminal_load_colorlist(Tn5250Config* config) {
     if (tn5250_config_get_bool(config, "black_on_white")) {
         for (x = COLOR_BLACK + 1; x <= COLOR_WHITE; x++) {
             colorlist[x].ref = COLOR_BLACK;
-            colorlist[x].bld = A_NORMAL;
+            colorlist[x].bld = WA_NORMAL;
         }
         colorlist[COLOR_BLACK].ref = COLOR_WHITE;
-        colorlist[COLOR_BLACK].bld = A_BOLD;
+        colorlist[COLOR_BLACK].bld = WA_BOLD;
     }
 
     if (tn5250_config_get_bool(config, "white_on_black")) {
         for (x = COLOR_BLACK + 1; x <= COLOR_WHITE; x++) {
             colorlist[x].ref = COLOR_WHITE;
-            colorlist[x].bld = A_BOLD;
+            colorlist[x].bld = WA_BOLD;
         }
         colorlist[COLOR_BLACK].ref = COLOR_BLACK;
-        colorlist[COLOR_BLACK].bld = A_NORMAL;
+        colorlist[COLOR_BLACK].bld = WA_NORMAL;
     }
 
     x = 0;
@@ -1652,7 +1650,7 @@ void curses_terminal_print_screen(Tn5250Terminal* This,
                     textlen = 0;
                 }
                 a = (c & 0xff);
-                curs_attr = attribute_map[a - 0x20];
+                curs_attr = attribute_map[a - 0x20].bld;
                 px = -1;
             }
             else {
@@ -1695,7 +1693,7 @@ void curses_terminal_print_screen(Tn5250Terminal* This,
 
     free(prttext);
 
-    attrset(attribute_map[0]);
+    attrset(attribute_map[0].bld);
     clear();
     mvprintw(0, 0, "Print Screen Successful!");
     mvprintw(1, 0, "Press ENTER to continue.");
@@ -1734,14 +1732,14 @@ void curses_postscript_print(FILE* out, int x, int y, char* string,
     }
 
     color = 0;
-    if (attr & A_REVERSE) { /* Print white text on black background */
+    if (attr & WA_REVERSE) { /* Print white text on black background */
         color = 1;
         fprintf(out, "(%s) %d %d blkbox\n", string, x, y);
     }
 
     fprintf(out, "(%s) %d %d %d prtnorm\n", string, x, y, color);
 
-    if (attr & A_UNDERLINE) { /* draw underline below text */
+    if (attr & WA_UNDERLINE) { /* draw underline below text */
         fprintf(out, "(%s) %d %d %d drawunderline\n", string, x, y, color);
     }
 }
