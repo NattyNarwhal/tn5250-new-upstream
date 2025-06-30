@@ -197,9 +197,9 @@ const char* tn5250_strerror(void) {
  * DESCRIPTION
  *    Translate the specified character from local to remote.
  *****/
-Tn5250Char tn5250_char_map_to_remote(Tn5250CharMap* map, Tn5250Char ascii) {
-   char in[7], out[7];
-   char *inp = in, *outp = out;
+Tn5250Char tn5250_char_map_to_remote(Tn5250CharMap* map, wchar_t ascii) {
+   wchar_t in[2], *inp = in;
+   char out[7], *outp = out;
    in[0] = ascii;
    in[1] = '\0';
    out[0] = '\0';
@@ -218,16 +218,16 @@ Tn5250Char tn5250_char_map_to_remote(Tn5250CharMap* map, Tn5250Char ascii) {
  * DESCRIPTION
  *    Translate the specified character from remote character to local.
  *****/
-Tn5250Char tn5250_char_map_to_local(Tn5250CharMap* map, Tn5250Char ebcdic) {
+wchar_t tn5250_char_map_to_local(Tn5250CharMap* map, Tn5250Char ebcdic) {
     switch (ebcdic) {
     case 0x1C:
-        return '*'; /* This should be an overstriken asterisk (DUP) */
+        return L'*'; /* This should be an overstriken asterisk (DUP) */
     case 0:
-        return ' ';
+        return L' ';
     default:
         {
-            char in[7], out[7];
-            char *inp = in, *outp = out;
+            char in[7], *inp = in;
+            wchar_t out[2], *outp = out;
             in[0] = ebcdic;
             in[1] = '\0';
             out[0] = '\0';
@@ -312,18 +312,17 @@ char *tn5250_encoding_name(const char *map)
 Tn5250CharMap* tn5250_char_map_new(const char* map) {
     TN5250_LOG(("tn5250_char_map_new: map = \"%s\"\n", map));
 
-#define SYS_ENCODING "ISO-8859-1"
     char *encoding_name = tn5250_encoding_name(map);
     TN5250_LOG(("using iconv encoding name \"%s\"\n", encoding_name));
     if (encoding_name == NULL) {
         return NULL;
     }
-    iconv_t to_remote_conv = iconv_open(encoding_name, SYS_ENCODING);
+    iconv_t to_remote_conv = iconv_open(encoding_name, "WCHAR_T");
     if (to_remote_conv == (iconv_t)-1) {
         free(encoding_name);
         return NULL;
     }
-    iconv_t to_local_conv = iconv_open(SYS_ENCODING, encoding_name);
+    iconv_t to_local_conv = iconv_open("WCHAR_T", encoding_name);
     if (to_local_conv == (iconv_t)-1) {
         free(encoding_name);
         iconv_close(to_remote_conv);
