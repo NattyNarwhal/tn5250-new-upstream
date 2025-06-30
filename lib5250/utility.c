@@ -203,7 +203,7 @@ Tn5250Char tn5250_char_map_to_remote(Tn5250CharMap* map, wchar_t ascii) {
    in[0] = ascii;
    in[1] = '\0';
    out[0] = '\0';
-   size_t inleft = 1, outleft = 6;
+   size_t inleft = 1 * sizeof(wchar_t), outleft = 6;
    iconv(map->to_remote_conv, (char**)&inp, &inleft, (char**)&outp, &outleft);
    return out[0];
 }
@@ -231,7 +231,7 @@ wchar_t tn5250_char_map_to_local(Tn5250CharMap* map, Tn5250Char ebcdic) {
             in[0] = ebcdic;
             in[1] = '\0';
             out[0] = '\0';
-            size_t inleft = 1, outleft = 6;
+            size_t inleft = 1, outleft = 2 * sizeof(wchar_t);
             iconv(map->to_local_conv, (char**)&inp, &inleft, (char**)&outp, &outleft);
             return out[0];
         }
