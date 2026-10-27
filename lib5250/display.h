@@ -96,6 +96,7 @@ struct _Tn5250Display {
     unsigned int uninhibited : 1;
     unsigned int allow_strpccmd : 1;
     unsigned int field_minus_in_char : 1;
+    unsigned int allow_buttons : 1;
 };
 
 typedef struct _Tn5250Display Tn5250Display;

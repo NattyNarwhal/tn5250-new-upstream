@@ -128,7 +128,6 @@ struct _Tn5250TerminalPrivate {
     unsigned int display_ruler : 1;
     unsigned int local_print : 1;
     unsigned int mouse_on_start : 1;
-    unsigned int display_button : 1;
 };
 
 #ifdef USE_OWN_KEY_PARSING
@@ -290,7 +289,6 @@ Tn5250Terminal* tn5250_curses_terminal_new() {
     r->data->display_ruler = 0;
     r->data->local_print = 0;
     r->data->mouse_on_start = 0;
-    r->data->display_button = 1;
     r->data->display = NULL;
     r->data->config = NULL;
 
@@ -518,10 +516,6 @@ void tn5250_curses_terminal_use_underscores(Tn5250Terminal* This, int u) {
  *****/
 void tn5250_curses_terminal_display_ruler(Tn5250Terminal* This, int f) {
     This->data->display_ruler = f;
-}
-
-void tn5250_curses_terminal_display_button(Tn5250Terminal* This, bool f) {
-    This->data->display_button = f;
 }
 
 /****i* lib5250/tn5250_curses_terminal_set_xterm_font

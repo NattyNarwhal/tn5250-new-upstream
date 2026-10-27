@@ -152,6 +152,11 @@ int tn5250_display_config(Tn5250Display* This, Tn5250Config* config) {
         This->allow_strpccmd = tn5250_config_get_bool(config, "allow_strpccmd");
     }
 
+    /* check if user wants clickable buttons in the UI */
+    if (tn5250_config_get(config, "buttons")) {
+        This->allow_buttons = tn5250_config_get_bool(config, "buttons");
+    }
+
     /* Should field minus act like field exit in a char field? */
     if (tn5250_config_get(config, "field_minus_in_char")) {
         This->field_minus_in_char =
@@ -3238,6 +3243,7 @@ void tn5250_display_update_buttons(Tn5250Display *This)
     unsigned char c;
 
     memset(This->buttons, 0, sizeof(Tn5250DisplayButton) * TN5250_DISPLAY_BUTTONS);
+    if (!(This->allow_buttons)) return;
 
     TN5250_LOG(("Updating buttons on screen\n"));
     for (int y = 0; y < height; y++) {
@@ -3296,6 +3302,7 @@ void tn5250_display_update_buttons(Tn5250Display *This)
 
 short tn5250_display_get_button(Tn5250Display * This, int y, int x)
 {
+	if (!(This->allow_buttons)) return 0;
 	for (int i = 0; i < TN5250_DISPLAY_BUTTONS; i++) {
 		short key = This->buttons[i].key;
 		if (!key) {
