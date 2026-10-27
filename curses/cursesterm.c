@@ -128,6 +128,7 @@ struct _Tn5250TerminalPrivate {
     unsigned int display_ruler : 1;
     unsigned int local_print : 1;
     unsigned int mouse_on_start : 1;
+    unsigned int display_button : 1;
 };
 
 #ifdef USE_OWN_KEY_PARSING
@@ -289,6 +290,7 @@ Tn5250Terminal* tn5250_curses_terminal_new() {
     r->data->display_ruler = 0;
     r->data->local_print = 0;
     r->data->mouse_on_start = 0;
+    r->data->display_button = 1;
     r->data->display = NULL;
     r->data->config = NULL;
 
@@ -518,6 +520,10 @@ void tn5250_curses_terminal_display_ruler(Tn5250Terminal* This, int f) {
     This->data->display_ruler = f;
 }
 
+void tn5250_curses_terminal_display_button(Tn5250Terminal* This, bool f) {
+    This->data->display_button = f;
+}
+
 /****i* lib5250/tn5250_curses_terminal_set_xterm_font
  * NAME
  *  tn5250_curses_terminal_set_xterm_font
@@ -706,9 +712,10 @@ static void curses_terminal_update(Tn5250Terminal* This,
         move(y, 0);
         for (x = 0; x < tn5250_display_width(display); x++) {
             c = tn5250_display_char_at(display, y, x);
+            bool is_ruler = curses_terminal_is_ruler(This, display, x, y);
             if ((c & 0xe0) == 0x20) { /* ATTRIBUTE */
                 a = (c & 0xff);
-                if (curses_terminal_is_ruler(This, display, x, y)) {
+                if (is_ruler) {
                     addch(A_REVERSE | attribute_map[0] | ' ');
                 }
                 else {
@@ -716,9 +723,10 @@ static void curses_terminal_update(Tn5250Terminal* This,
                 }
             }
             else { /* DATA */
+                short is_button = tn5250_display_get_button(display, y, x);
                 curs_attr = attribute_map[a - 0x20];
                 if (curs_attr == 0x00) { /* NONDISPLAY */
-                    if (curses_terminal_is_ruler(This, display, x, y)) {
+                    if (is_ruler || is_button) {
                         addch(A_REVERSE | attribute_map[0] | ' ');
                     }
                     else {
@@ -753,7 +761,7 @@ static void curses_terminal_update(Tn5250Terminal* This,
                             }
                         }
                     }
-                    if (curses_terminal_is_ruler(This, display, x, y)) {
+                    if (is_ruler || is_button) {
                         curs_attr |= A_REVERSE;
                     }
                     addch((chtype)(c | curs_attr));
