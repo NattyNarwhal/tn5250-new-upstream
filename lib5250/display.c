@@ -3236,13 +3236,14 @@ int display_check_pccmd(Tn5250Display* This) {
     return 1;
 }
 
-void tn5250_display_update_buttons(Tn5250Display *This)
-{
-    int width = tn5250_display_width(This), height = tn5250_display_height(This);
+void tn5250_display_update_buttons(Tn5250Display* This) {
+    int width = tn5250_display_width(This),
+        height = tn5250_display_height(This);
     int index = 0, key = 0, length = 0, bx = 0;
     unsigned char c;
 
-    memset(This->buttons, 0, sizeof(Tn5250DisplayButton) * TN5250_DISPLAY_BUTTONS);
+    memset(This->buttons, 0,
+           sizeof(Tn5250DisplayButton) * TN5250_DISPLAY_BUTTONS);
     if (!(This->allow_buttons)) return;
 
     TN5250_LOG(("Updating buttons on screen\n"));
@@ -3252,8 +3253,7 @@ void tn5250_display_update_buttons(Tn5250Display *This)
             length = 0;
             bx = x;
 
-            if (index == TN5250_DISPLAY_BUTTONS)
-                return;
+            if (index == TN5250_DISPLAY_BUTTONS) return;
 
             c = tn5250_display_char_at(This, y, bx);
             if (c == 0xD7) { /* P */
@@ -3265,7 +3265,8 @@ void tn5250_display_update_buttons(Tn5250Display *This)
             }
             if (c == 0xC6) { /* F */
                 length++;
-            } else {
+            }
+            else {
                 continue;
             }
             if (++bx > width) {
@@ -3275,7 +3276,8 @@ void tn5250_display_update_buttons(Tn5250Display *This)
             if (c >= 0xF1 && c <= 0xF9) {
                 key = c - 0xF0;
                 length++;
-            } else {
+            }
+            else {
                 continue;
             }
             if (++bx <= width) {
@@ -3284,12 +3286,13 @@ void tn5250_display_update_buttons(Tn5250Display *This)
                     TN5250_LOG(("More: that is %x...\n", c));
                     key = (c - 0xF0) + (key * 10);
                     length++;
-		}
+                }
             }
 
             if (key && length) {
-                TN5250_LOG(("Button with key F%d at %d,%d len %d\n", key, y, x, length));
-		This->buttons[index].key = 0410 + key; /* K_F1 */
+                TN5250_LOG(("Button with key F%d at %d,%d len %d\n", key, y, x,
+                            length));
+                This->buttons[index].key = 0410 + key; /* K_F1 */
                 This->buttons[index].y = y;
                 This->buttons[index].x = x;
                 This->buttons[index++].len = length;
@@ -3300,20 +3303,19 @@ void tn5250_display_update_buttons(Tn5250Display *This)
     TN5250_LOG(("%d button(s) found\n", index));
 }
 
-short tn5250_display_get_button(Tn5250Display * This, int y, int x)
-{
-	if (!(This->allow_buttons)) return 0;
-	for (int i = 0; i < TN5250_DISPLAY_BUTTONS; i++) {
-		short key = This->buttons[i].key;
-		if (!key) {
-			return 0;
-		}
+short tn5250_display_get_button(Tn5250Display* This, int y, int x) {
+    if (!(This->allow_buttons)) return 0;
+    for (int i = 0; i < TN5250_DISPLAY_BUTTONS; i++) {
+        short key = This->buttons[i].key;
+        if (!key) {
+            return 0;
+        }
 
-		int by = This->buttons[i].y, bx = This->buttons[i].x;
-		int len = This->buttons[i].len - 1;
-		if (y == by && (x >= bx && x <= bx + len)) {
-			return key;
-		}
-	}
-	return 0;
+        int by = This->buttons[i].y, bx = This->buttons[i].x;
+        int len = This->buttons[i].len - 1;
+        if (y == by && (x >= bx && x <= bx + len)) {
+            return key;
+        }
+    }
+    return 0;
 }

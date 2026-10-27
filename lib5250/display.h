@@ -114,8 +114,8 @@ extern Tn5250DBuffer* tn5250_display_push_dbuffer(Tn5250Display* This);
 extern void tn5250_display_restore_dbuffer(Tn5250Display* This,
                                            Tn5250DBuffer* display);
 
-extern void tn5250_display_update_buttons(Tn5250Display *This);
-extern short tn5250_display_get_button(Tn5250Display * This, int y, int x);
+extern void tn5250_display_update_buttons(Tn5250Display* This);
+extern short tn5250_display_get_button(Tn5250Display* This, int y, int x);
 
 extern void tn5250_display_set_terminal(Tn5250Display* This,
                                         struct _Tn5250Terminal*);
