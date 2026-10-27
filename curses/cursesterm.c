@@ -919,8 +919,15 @@ static int curses_terminal_getkey(Tn5250Terminal* This) {
                 if ((event.y < tn5250_display_height(This->data->display) &&
                      event.x < tn5250_display_width(This->data->display)) &&
                     event.bstate & BUTTON1_CLICKED) {
-                    tn5250_display_set_cursor(This->data->display, event.y,
-                                              event.x);
+                    /* Hit test for a key */
+                    short button_key = tn5250_display_get_button(This->data->display, event.y, event.x);
+                    if (button_key) {
+                        TN5250_LOG(("Hit button at %d,%d: key %x (K_F1 %d for scale)\n", event.y, event.x, button_key, K_F1));
+                        return button_key;
+                    } else {
+                        tn5250_display_set_cursor(This->data->display, event.y,
+                                                  event.x);
+                    }
                 }
             }
             return -1;
