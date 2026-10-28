@@ -3256,6 +3256,13 @@ void tn5250_display_update_buttons(Tn5250Display* This) {
 
             if (index == TN5250_DISPLAY_BUTTONS_SIZE) return;
 
+            /*
+             * We scan for PFnn and Fnn. ACS offers FPnn as well, but we don't
+             * check for that.
+             *
+             * We do not yet do numbered entries (for menus), recognized macro
+             * names, or URLs.
+             */
             c = tn5250_display_char_at(This, y, bx);
             if (c == 0xD7) { /* P */
                 length++;
