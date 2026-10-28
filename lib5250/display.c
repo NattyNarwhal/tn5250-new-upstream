@@ -3283,7 +3283,8 @@ void tn5250_display_update_buttons(Tn5250Display* This) {
             }
             if (++bx <= width) {
                 c = tn5250_display_char_at(This, y, bx);
-                if ((c >= 0xF0 && c <= 0xF4) && (key == 1 || key == 2)) {
+                if ((key == 1 && (c >= 0xF0 && c <= 0xF9)) ||
+                    (key == 2 && (c >= 0xF0 && c <= 0xF4))) {
                     TN5250_LOG(("More: that is %x...\n", c));
                     key = (c - 0xF0) + (key * 10);
                     length++;
