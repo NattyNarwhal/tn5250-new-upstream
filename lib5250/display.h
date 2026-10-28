@@ -28,7 +28,7 @@ extern "C" {
 
 #define TN5250_DISPLAY_KEYQ_SIZE 50
 
-#define TN5250_DISPLAY_BUTTONS 50
+#define TN5250_DISPLAY_BUTTONS_SIZE 50
 
 #define TN5250_DISPLAY_IND_INHIBIT         0x0001
 #define TN5250_DISPLAY_IND_MESSAGE_WAITING 0x0002
@@ -87,7 +87,8 @@ struct _Tn5250Display {
     int key_queue[TN5250_DISPLAY_KEYQ_SIZE];
 
     /* Buttons recognized from labels on screen. */
-    struct _Tn5250DisplayButton buttons[TN5250_DISPLAY_BUTTONS];
+    struct _Tn5250DisplayButton buttons[TN5250_DISPLAY_BUTTONS_SIZE];
+    int button_count;
 
     unsigned int indicators_dirty : 1;
     unsigned int pending_insert : 1;
